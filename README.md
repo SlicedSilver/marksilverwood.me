@@ -1,4 +1,6 @@
-marksilverwood.me
-=================
+Mark Silverwood's Personal Website
+==================================
 
-Personal Website
+[marksilverwood.me](http://marksilverwood.me)
+
+Copyright 2014 Mark William Silverwood

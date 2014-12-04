@@ -1,0 +1,9 @@
+{
+  "name": "marksilverwood-me",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "jquery": "~1.11.1",
+    "modernizr": "~2.8.2"
+  }
+}
