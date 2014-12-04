@@ -1,23 +1,29 @@
 // bower:scss
 // endbower
 
+@mixin backcolour_alpha($color, $opacity:1) {
+  background-color: $color;
+  /* The Fallback */
+  background-color: rgba($color, $opacity);
+}
+
 body {
-  background: #fafafa;
+  background: #222;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: #333;
 }
 
 .hero-unit {
   margin: 50px auto 0 auto;
-  width: 300px;
+  width: 400px;
   font-size: 18px;
   font-weight: 200;
   line-height: 30px;
-  background-color: #eee;
+  @include backcolour_alpha(#fff,0.667);
   border-radius: 6px;
-  padding: 60px;
+  padding: 40px;
   h1 {
-    font-size: 60px;
+    font-size: 40px;
     line-height: 1;
     letter-spacing: -1px;
   }
