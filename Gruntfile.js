@@ -9,12 +9,29 @@
 // 'test/spec/**/*.js'
 
 module.exports = function (grunt) {
+  grunt.loadNpmTasks('grunt-gh-pages');
 
   // Time how long tasks take. Can help when optimizing build times
   require('time-grunt')(grunt);
 
   // Load grunt tasks automatically
   require('load-grunt-tasks')(grunt);
+
+  // get a formatted commit message to review changes from the commit log
+  // github will turn some of these into clickable links
+  function getDeployMessage() {
+    var ret = '\n\n';
+    if (process.env.TRAVIS !== 'true') {
+      ret += 'missing env vars for travis-ci';
+      return ret;
+    }
+    ret += 'branch:       ' + process.env.TRAVIS_BRANCH + '\n';
+    ret += 'SHA:          ' + process.env.TRAVIS_COMMIT + '\n';
+    ret += 'range SHA:    ' + process.env.TRAVIS_COMMIT_RANGE + '\n';
+    ret += 'build id:     ' + process.env.TRAVIS_BUILD_ID + '\n';
+    ret += 'build number: ' + process.env.TRAVIS_BUILD_NUMBER + '\n';
+    return ret;
+  }
 
   // Configurable paths
   var config = {
@@ -91,6 +108,34 @@ module.exports = function (grunt) {
         }
       }
     },
+
+    // Publishes website to Github Pages
+    'gh-pages': {
+      options: {
+        branch: 'gh-pages',
+        base: 'dist'
+      },
+      publish: {
+        options: {
+          repo: 'https://github.com/SlicedSilver/marksilverwood.me.git',
+          message: 'publish gh-pages (cli)'
+        },
+        src: ['**/*']
+      },
+      deploy: {
+        options: {
+          user: {
+            name: 'Mark Silverwood',
+            email: 'msilverwood@gmail.com'
+          },
+          repo: 'https://' + process.env.GH_TOKEN + '@github.com/SlicedSilver/marksilverwood.me.git',
+          message: 'publish gh-pages (auto)' + getDeployMessage(),
+          silent: true
+        },
+        src: ['**/*']
+      }
+    },
+
 
     // Empties folders to start fresh
     clean: {
@@ -343,6 +388,20 @@ module.exports = function (grunt) {
   });
 
 
+  grunt.registerTask('check-deploy', function () {
+    // need this
+    this.requires(['build']);
+
+    // only deploy under these conditions
+    if (process.env.TRAVIS === 'true' && process.env.TRAVIS_SECURE_ENV_VARS === 'true' && process.env.TRAVIS_PULL_REQUEST === 'false') {
+      grunt.log.writeln('executing deployment');
+      // queue deploy
+      grunt.task.run('gh-pages:deploy');
+    } else {
+      grunt.log.writeln('skipped deployment');
+    }
+  });
+
   grunt.registerTask('serve', 'start the server and preview your app, --allow-remote for remote access', function (target) {
     if (grunt.option('allow-remote')) {
       grunt.config.set('connect.options.hostname', '0.0.0.0');
@@ -366,6 +425,16 @@ module.exports = function (grunt) {
     grunt.task.run([target ? ('serve:' + target) : 'serve']);
   });
 
+  grunt.registerTask('publish', 'Publish from CLI', [
+  'build',
+  'gh-pages:publish'
+  ]);
+
+  grunt.registerTask('deploy', 'Publish from Travis', [
+  'build',
+  'check-deploy'
+  ]);
+
   grunt.registerTask('build', [
     'clean:dist',
     'wiredep',
@@ -376,7 +445,7 @@ module.exports = function (grunt) {
     'cssmin',
     'uglify',
     'copy:dist',
-    'modernizr',
+    //'modernizr',
     'rev',
     'usemin',
     'htmlmin'

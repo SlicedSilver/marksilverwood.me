@@ -1,0 +1,15 @@
+language: node_js
+node_js:
+- '0.10'
+before_install:
+- npm install -g grunt-cli
+- npm install -g bower
+- bower install
+script:
+- grunt deploy
+branches:
+  only:
+  - master
+env:
+  global:
+  - secure: C352i5a+xNEhPGyexcSE4RmI305B9LYzXhLC9WxA+kxr9TqQis6R5c5XmBsPH6d0nZ2Z2jrJh0J7W2WBgmYmU0CaxpdxPNCgXXcCphP7LIM7c3mJuqWIel1vVWxI4qYgGbROGzp6eWZZ7KWTRKwTPZ58OHHDLq4R168U9cfPZ6M=
