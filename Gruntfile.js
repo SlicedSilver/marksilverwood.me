@@ -17,6 +17,9 @@ module.exports = function (grunt) {
   // Load grunt tasks automatically
   require('load-grunt-tasks')(grunt);
 
+  // Markdown
+  grunt.loadNpmTasks('grunt-markdown');
+
   // get a formatted commit message to review changes from the commit log
   // github will turn some of these into clickable links
   function getDeployMessage() {
@@ -61,6 +64,10 @@ module.exports = function (grunt) {
       gruntfile: {
         files: ['Gruntfile.js']
       },
+      markdown:{
+        files: ['<%= config.app %>/markdown/{,*/}*.md'],
+        tasks: ['markdown']
+      },
       sass: {
         files: ['<%= config.app %>/styles/{,*/}*.{scss,sass}'],
         tasks: ['sass:server', 'autoprefixer']
@@ -85,7 +92,7 @@ module.exports = function (grunt) {
     connect: {
       options: {
         port: 9000,
-        open: true,
+        open: false,
         livereload: 35729,
         // Change this to '0.0.0.0' to access the server from outside
         hostname: 'localhost'
@@ -108,6 +115,76 @@ module.exports = function (grunt) {
         }
       }
     },
+
+    markdown: {
+      dist: {
+        files: [
+        {
+          expand: true,
+          flatten: true,
+          src: '<%= config.app %>/markdown/*.md',
+          dest: '<%= config.dist %>/',
+          ext: '.html'
+        }
+        ],
+        options: {
+          template: '<%= config.app %>/markdown/template.html',
+          markdownOptions: {
+            gfm: true,
+            highlight: 'manual',
+            codeLines: {
+              before: '<span>',
+              after: '</span>'
+            }
+          }
+        }
+      },
+      server: {
+        files: [
+        {
+          expand: true,
+          flatten: true,
+          src: '<%= config.app %>/markdown/*.md',
+          dest: '.tmp/',
+          ext: '.html'
+        }
+        ],
+        options: {
+          template: '<%= config.app %>/markdown/template.html',
+          markdownOptions: {
+            gfm: true,
+            highlight: 'manual',
+            codeLines: {
+              before: '<span>',
+              after: '</span>'
+            }
+          }
+        }
+      }//,
+      // all: {
+      //   files: [
+      //   {
+      //     expand: true,
+      //     flatten: true,
+      //     src: '<%= config.app %>/markdown/*.md',
+      //     dest: '.tmp/',
+      //     ext: '.html'
+      //   }
+      //   ],
+      //   options: {
+      //     template: '<%= config.app %>/markdown/template.html',
+      //     markdownOptions: {
+      //       gfm: true,
+      //       highlight: 'manual',
+      //       codeLines: {
+      //         before: '<span>',
+      //         after: '</span>'
+      //       }
+      //     }
+      //   }
+      // }
+    },
+
 
     // Publishes website to Github Pages
     'gh-pages': {
@@ -340,7 +417,8 @@ module.exports = function (grunt) {
             'images/{,*/}*.webp',
             '{,*/}*.html',
             'styles/fonts/{,*/}*.*',
-            'CNAME'
+            'CNAME',
+            '!markdown/*.*'
           ]
         }, {
           src: 'node_modules/apache-server-configs/dist/.htaccess',
@@ -415,6 +493,7 @@ module.exports = function (grunt) {
       'clean:server',
       'wiredep',
       'concurrent:server',
+      'markdown:server',
       'autoprefixer',
       'connect:livereload',
       'watch'
@@ -442,6 +521,7 @@ module.exports = function (grunt) {
     'useminPrepare',
     'concurrent:dist',
     'autoprefixer',
+    'markdown:dist',
     'concat',
     'cssmin',
     'uglify',
