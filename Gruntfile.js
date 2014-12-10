@@ -246,9 +246,12 @@ module.exports = function (grunt) {
     sass: {
       options: {
         sourceMap: true,
-        includePaths: ['bower_components']
+        includePaths: ['bower_components','bower_components/foundation/scss']
         },
       dist: {
+        options: {
+          outputStyle: 'compressed'
+        },
         files: [{
           expand: true,
           cwd: '<%= config.app %>/styles',

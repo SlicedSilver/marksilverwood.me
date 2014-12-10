@@ -2,6 +2,7 @@
 /* global Trianglify */
 
 console.log('Mark Silverwood - marksilverwood.me');
+$(document).foundation();
 var w = window,
 d = document,
 e = d.documentElement,
